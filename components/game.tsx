@@ -12,7 +12,8 @@ export default function Game() {
   const [state, setState] = useState<GameState | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [started, setStarted] = useState(false);
-  const [items, setItems] = useState<Item[] | null>(null);
+  const [allItems, setAllItems] = useState<Item[] | null>(null);
+  const [filteredItems, setFilteredItems] = useState<Item[] | null>(null);
 
   React.useEffect(() => {
     const fetchGameData = async () => {
@@ -29,7 +30,8 @@ export default function Game() {
         .filter((item) => !/(?:th|st|nd)[ -]century/i.test(item.description))
         // Filter cards which have bad data as submitted in https://github.com/tom-james-watson/wikitrivia/discussions/2
         .filter((item) => !(item.id in badCards));
-      setItems(items);
+      setAllItems(items);
+      setFilteredItems(items);
     };
 
     fetchGameData();
@@ -37,20 +39,20 @@ export default function Game() {
 
   React.useEffect(() => {
     (async () => {
-      if (items !== null) {
-        setState(await createState(items));
+      if (filteredItems !== null) {
+        setState(await createState(filteredItems));
         setLoaded(true);
       }
     })();
-  }, [items]);
+  }, [filteredItems]);
 
   const resetGame = React.useCallback(() => {
     (async () => {
-      if (items !== null) {
-        setState(await createState(items));
+      if (filteredItems !== null) {
+        setState(await createState(filteredItems));
       }
     })();
-  }, [items]);
+  }, [filteredItems]);
 
   const [highscore, setHighscore] = React.useState<number>(
     Number(localStorage.getItem("highscore") ?? "0")
@@ -67,7 +69,12 @@ export default function Game() {
 
   if (!started) {
     return (
-      <Instructions highscore={highscore} start={() => setStarted(true)} />
+      <Instructions
+        highscore={highscore}
+        start={() => setStarted(true)}
+        allItems={allItems}
+        setFilteredItems={setFilteredItems}
+      />
     );
   }
 

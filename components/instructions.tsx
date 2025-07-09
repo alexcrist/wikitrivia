@@ -1,16 +1,20 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import GitHubButton from "react-github-btn";
 import styles from "../styles/instructions.module.scss";
 import Button from "./button";
 import Score from "./score";
+import Checkboxes from "./checkboxes";
+import { Item } from "../types/item";
 
 interface Props {
   highscore: number;
   start: () => void;
+  allItems: Item[] | null;
+  setFilteredItems: Dispatch<SetStateAction<Item[] | null>>;
 }
 
 export default function Instructions(props: Props) {
-  const { highscore, start } = props;
+  const { highscore, start, allItems, setFilteredItems } = props;
 
   return (
     <div className={styles.instructions}>
@@ -22,6 +26,7 @@ export default function Instructions(props: Props) {
           </div>
         )}
         <Button onClick={start} text="Start game" />
+        <Checkboxes allItems={allItems} setFilteredItems={setFilteredItems} />
         <div className={styles.about}>
           <div>
             All data sourced from{" "}
